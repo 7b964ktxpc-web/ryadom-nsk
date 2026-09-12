@@ -128,11 +128,18 @@ function HomePage() {
 }
 
 function LoginPage() {
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
   const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [sending, setSending] = useState(false);
+  const [guestName, setGuestName] = useState("");
+  const [tab, setTab] = useState<"guest" | "sms">("guest");
+
+  const handleGuest = async () => {
+    setSending(true);
+    try { await loginAsGuest(guestName || "Гость"); navigate("/"); } catch { setSending(false); }
+  };
 
   const handleLogin = async () => {
     if (!phone || phone.length < 10) return;
@@ -142,29 +149,70 @@ function LoginPage() {
 
   return <div className="min-h-screen bg-slate-100/60">
     <Header />
-    <main className="max-w-md mx-auto px-4 py-12">
-      <div className="bg-white rounded-3xl shadow-xl p-6">
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-rose-500 to-amber-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl mx-auto mb-4">НСК</div>
-          <h2 className="text-2xl font-black text-slate-900">Вход в РЯДОМ</h2>
-          <p className="text-slate-400 text-sm mt-1">Войдите через SMS-код</p>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <label className="text-xs font-bold text-slate-500 mb-1 block">Имя</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Как вас зовут?" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm" />
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-500 mb-1 block">Телефон</label>
-            <div className="flex gap-2">
-              <span className="bg-slate-100 border border-slate-200 rounded-xl px-3 py-3 text-sm font-bold text-slate-600">+7</span>
-              <input value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder="9001234567" className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm" />
-            </div>
-          </div>
-          <button onClick={handleLogin} disabled={sending || phone.length < 10} className="w-full py-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-black rounded-xl disabled:opacity-40">
-            {sending ? "Отправка SMS..." : "Получить код"}
+    <main className="max-w-md mx-auto px-4 py-8">
+      <div className="text-center mb-6">
+        <div className="w-20 h-20 bg-gradient-to-br from-rose-500 to-amber-500 rounded-3xl flex items-center justify-center text-white font-black text-3xl mx-auto mb-4 shadow-lg">НСК</div>
+        <h1 className="text-3xl font-black text-slate-900">РЯДОМ НСК</h1>
+        <p className="text-slate-500 text-sm mt-2">Всё полезное рядом с тобой</p>
+      </div>
+
+      <div className="bg-white rounded-3xl shadow-xl p-6 mb-4">
+        <div className="flex gap-2 mb-6">
+          <button onClick={() => setTab("guest")} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition ${tab === "guest" ? "bg-rose-500 text-white" : "bg-slate-100 text-slate-500"}`}>
+            Просто зайти
           </button>
-          <p className="text-center text-[11px] text-slate-400">Нажимая кнопку вы соглашаетесь с условиями сервиса и политикой конфиденциальности</p>
+          <button onClick={() => setTab("sms")} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition ${tab === "sms" ? "bg-rose-500 text-white" : "bg-slate-100 text-slate-500"}`}>
+            По телефону
+          </button>
+        </div>
+
+        {tab === "guest" ? (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-500">Ознакомьтесь с проектом, просматривайте объявления, создавайте свои</p>
+            <div>
+              <label className="text-xs font-bold text-slate-500 mb-1 block">Как вас зовут?</label>
+              <input value={guestName} onChange={e => setGuestName(e.target.value)} placeholder="Ваше имя" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm" autoFocus />
+            </div>
+            <button onClick={handleGuest} disabled={sending} className="w-full py-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-black rounded-xl disabled:opacity-40 shadow-lg shadow-rose-200">
+              {sending ? "Входим..." : "Зайти и посмотреть"}
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-500">Войдите по телефону для полного доступа</p>
+            <div>
+              <label className="text-xs font-bold text-slate-500 mb-1 block">Имя</label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="Как вас зовут?" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-500 mb-1 block">Телефон</label>
+              <div className="flex gap-2">
+                <span className="bg-slate-100 border border-slate-200 rounded-xl px-3 py-3 text-sm font-bold text-slate-600">+7</span>
+                <input value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder="9001234567" className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm" />
+              </div>
+            </div>
+            <button onClick={handleLogin} disabled={sending || phone.length < 10} className="w-full py-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-black rounded-xl disabled:opacity-40">
+              {sending ? "Отправка SMS..." : "Получить код"}
+            </button>
+          </div>
+        )}
+
+        <p className="text-center text-[11px] text-slate-400 mt-4">Нажимая кнопку вы соглашаетесь с условиями сервиса и политикой конфиденциальности</p>
+      </div>
+
+      <div className="bg-white rounded-2xl p-4 border border-slate-200">
+        <h3 className="font-bold text-slate-900 text-sm mb-3">Что можно делать в РЯДОМ:</h3>
+        <div className="space-y-2">
+          {[
+            { icon: "🆘", text: "Искать помощников — электриков, сантехников, грузчиков" },
+            { icon: "🛍", text: "Находить скидки у кафе и магазинов рядом" },
+            { icon: "🎉", text: "Узнавать о событиях в вашем районе" },
+            { icon: "🤝", text: "Помогать соседям и находить нужное" },
+            { icon: "📢", text: "Размещать свои объявления бесплатно" },
+          ].map((item, i) => <div key={i} className="flex items-start gap-2">
+            <span className="text-lg mt-0.5">{item.icon}</span>
+            <span className="text-sm text-slate-600">{item.text}</span>
+          </div>)}
         </div>
       </div>
     </main>

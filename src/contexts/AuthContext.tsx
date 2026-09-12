@@ -22,6 +22,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (phone: string, name: string, role?: string) => Promise<void>;
+  loginAsGuest: (name: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -97,13 +98,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const loginAsGuest = useCallback(async (name: string) => {
+    const res = await fetch("/api/auth/guest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name || "Гость" }),
+    });
+    const data = await res.json();
+    setUser(data);
+    localStorage.setItem("ryadom_user", JSON.stringify(data));
+  }, []);
+
   const logout = useCallback(async () => {
     if (supabase) await supabase.auth.signOut();
     setUser(null);
     localStorage.removeItem("ryadom_user");
   }, []);
 
-  return <AuthCtx.Provider value={{ user, loading, login, logout }}>
+  return <AuthCtx.Provider value={{ user, loading, login, loginAsGuest, logout }}>
     {loading ? <div className="min-h-screen bg-slate-100 flex items-center justify-center"><div className="text-center"><div className="w-16 h-16 bg-gradient-to-br from-rose-500 to-amber-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl mx-auto mb-4">НСК</div><p className="text-slate-500 text-sm">Загрузка РЯДОМ НСК...</p></div></div> : children}
   </AuthCtx.Provider>;
 }

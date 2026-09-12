@@ -392,6 +392,13 @@ app.post("/api/auth/login", (req, res) => {
   res.json(user);
 });
 
+app.post("/api/auth/guest", (req, res) => {
+  const { name } = req.body;
+  const guestId = `guest-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const user = db.registerOrLoginUser({ phone: `+7000${Date.now()}`, name: name || "Гость", role: "user", district: "Октябрьский" });
+  res.json(user);
+});
+
 app.get("/api/auth/user/:id", (req, res) => {
   const user = db.getUserById(req.params.id);
   if (!user) return res.status(404).json({ error: "User not found" });
