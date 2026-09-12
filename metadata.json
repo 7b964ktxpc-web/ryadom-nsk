@@ -1,0 +1,6 @@
+{
+  "name": "РЯДОМ НСК",
+  "description": "Гиперлокальный городской сервис Новосибирска — всё полезное рядом с тобой прямо сейчас",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

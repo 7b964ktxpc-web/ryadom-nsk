@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: ryadom-nsk
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "900000"
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "100"
+      - key: OPERATOR_NAME
+        value: "РЯДОМ НСК"
+      - key: OPERATOR_ADDRESS
+        value: "г. Новосибирск"
+      - key: OPERATOR_CONTACT
+        value: "privacy@ryadom.nsk"
+      - key: ADMIN_EMAIL
+        value: "admin@ryadom.nsk"

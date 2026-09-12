@@ -1,0 +1,19 @@
+{
+  "short_name": "РЯДОМ НСК",
+  "name": "РЯДОМ НСК — Всё полезное рядом с тобой",
+  "description": "Гиперлокальный городской сервис Новосибирска — скидки, срочные задачи, мастера и события рядом с тобой.",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#f43f5e",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "ru"
+}
