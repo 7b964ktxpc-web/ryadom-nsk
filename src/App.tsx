@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient
 import { ConsentProvider } from "./contexts/ConsentContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { CookieConsent } from "./components/CookieConsent";
+import { OnboardingModal } from "./components/OnboardingModal";
 
 const API = "";
 
@@ -91,26 +92,49 @@ function PostCard({ p, onClick }: PostCardProps) {
 
 function HomePage() {
   const { data: posts = [], isLoading } = useQuery<Post[]>({ queryKey: ["posts"], queryFn: () => fetch(`${API}/api/posts`).then(r => r.json()) });
+  const [filter, setFilter] = useState<string>("all");
+
   const deals = posts.filter(p => p.type === "deal");
   const requests = posts.filter(p => p.type === "request");
   const events = posts.filter(p => p.type === "event");
   const urgent = posts.filter(p => p.urgency === "high");
 
+  const filters = [
+    { key: "all", label: "Все", emoji: "📋", count: posts.length },
+    { key: "request", label: "Нужна помощь", emoji: "🆘", count: requests.length },
+    { key: "deal", label: "Скидки", emoji: "🛍", count: deals.length },
+    { key: "event", label: "События", emoji: "🎉", count: events.length },
+    { key: "urgent", label: "Срочно", emoji: "⚡", count: urgent.length },
+  ];
+
+  const filtered = filter === "all" ? posts : filter === "urgent" ? urgent : posts.filter(p => p.type === filter);
+
   return <div className="min-h-screen bg-slate-100/60">
     <Header />
     <main className="max-w-6xl mx-auto px-3 sm:px-6 py-6">
-      <div className="text-center mb-8">
+      <div className="text-center mb-6">
         <h1 className="text-4xl font-black text-slate-900">РЯДОМ НСК</h1>
-        <p className="text-slate-500 text-lg mt-2">Всё полезное рядом с тобой</p>
-        <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
-          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-600 bg-white px-4 py-2 rounded-xl border border-slate-200">🛍 {deals.length} предложений</span>
-          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-700 bg-amber-50 px-4 py-2 rounded-xl">🆘 {urgent.length} срочных</span>
-          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-purple-700 bg-purple-50 px-4 py-2 rounded-xl">🎉 {events.length} событий</span>
-          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-700 bg-blue-50 px-4 py-2 rounded-xl">📋 {requests.length} запросов</span>
-        </div>
+        <p className="text-slate-500 mt-2">Всё полезное в шаговой доступности</p>
+        <p className="text-xs text-slate-400 mt-1">Новосибирск — помощь соседей, скидки, события рядом с вами</p>
       </div>
 
-      {isLoading ? <div className="text-center py-12 text-slate-400">Загрузка...</div> : posts.length === 0 ? (
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-6 -mx-1 px-1 scrollbar-hide">
+        {filters.map(f => (
+          <button key={f.key} onClick={() => setFilter(f.key)}
+            className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition ${filter === f.key ? "bg-rose-500 text-white shadow-md shadow-rose-200" : "bg-white text-slate-600 border border-slate-200 hover:border-rose-300"}`}>
+            <span>{f.emoji}</span>
+            <span>{f.label}</span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${filter === f.key ? "bg-white/20" : "bg-slate-100"}`}>{f.count}</span>
+          </button>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <div className="text-center py-12 text-slate-400">
+          <div className="w-10 h-10 border-4 border-rose-300 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          Загрузка...
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-3xl border border-slate-200">
           <p className="text-4xl mb-3">🏘</p>
           <p className="text-slate-600 font-bold mb-1">Пока нет публикаций</p>
@@ -118,7 +142,7 @@ function HomePage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {posts.map(p => <PostCard key={p.id} p={p} />)}
+          {filtered.map(p => <PostCard key={p.id} p={p} />)}
         </div>
       )}
     </main>
@@ -455,6 +479,9 @@ export const router = createBrowserRouter([
 
 export default function App() {
   return <QueryClientProvider client={queryClient}>
-    <ConsentProvider><AuthProvider><RouterProvider router={router} /></AuthProvider></ConsentProvider>
+    <ConsentProvider><AuthProvider>
+      <RouterProvider router={router} />
+      <OnboardingModal />
+    </AuthProvider></ConsentProvider>
   </QueryClientProvider>;
 }
