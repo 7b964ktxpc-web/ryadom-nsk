@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 interface User {
@@ -50,7 +49,6 @@ function buildUser(id: string, meta: Record<string, unknown> = {}): User {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (supabase) {
@@ -86,7 +84,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (!error) {
         setUser(buildUser(crypto.randomUUID(), { name, phone: `+7${phone}`, role: role || "user" }));
-        navigate("/");
       }
     } else {
       const res = await fetch("/api/auth/login", {
@@ -97,16 +94,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       setUser(data);
       localStorage.setItem("ryadom_user", JSON.stringify(data));
-      navigate("/");
     }
-  }, [navigate]);
+  }, []);
 
   const logout = useCallback(async () => {
     if (supabase) await supabase.auth.signOut();
     setUser(null);
     localStorage.removeItem("ryadom_user");
-    navigate("/");
-  }, [navigate]);
+  }, []);
 
   return <AuthCtx.Provider value={{ user, loading, login, logout }}>
     {loading ? <div className="min-h-screen bg-slate-100 flex items-center justify-center"><div className="text-center"><div className="w-16 h-16 bg-gradient-to-br from-rose-500 to-amber-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl mx-auto mb-4">НСК</div><p className="text-slate-500 text-sm">Загрузка РЯДОМ НСК...</p></div></div> : children}

@@ -36,7 +36,7 @@ function Header() {
       </div>
       <div className="flex items-center gap-3">
         {user ? <span className="text-sm font-bold text-slate-700">{user.name}</span> : <button onClick={() => navigate("/login")} className="px-4 py-1.5 bg-rose-500 text-white text-xs font-bold rounded-xl">Войти</button>}
-        {user && <button onClick={logout} className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-200">Выход</button>}
+        {user && <button onClick={async () => { await logout(); navigate("/"); }} className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-bold rounded-xl hover:bg-slate-200">Выход</button>}
       </div>
     </div>
   </header>;
@@ -284,7 +284,7 @@ function ProfilePage() {
         </div>
         <div className="space-y-2">
           <button onClick={() => navigate("/")} className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm">Мои публикации</button>
-          <button onClick={logout} className="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-sm">Выйти</button>
+          <button onClick={async () => { await logout(); navigate("/"); }} className="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-sm">Выйти</button>
         </div>
       </div>
     </main>
