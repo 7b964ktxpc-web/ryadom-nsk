@@ -116,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return <AuthCtx.Provider value={{ user, loading, login, loginAsGuest, logout }}>
-    {loading ? <div className="min-h-screen bg-slate-100 flex items-center justify-center"><div className="text-center"><div className="w-16 h-16 bg-gradient-to-br from-rose-500 to-amber-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl mx-auto mb-4">НСК</div><p className="text-slate-500 text-sm">Загрузка РЯДОМ НСК...</p></div></div> : children}
+    {loading ? <div className="min-h-screen bg-bg flex items-center justify-center"><div className="text-center"><div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center text-bg font-display font-black text-3xl mx-auto mb-4 shadow-lg shadow-primary/30 animate-float">Р</div><p className="text-text-secondary text-sm">Загрузка РЯДОМ НСК...</p></div></div> : children}
   </AuthCtx.Provider>;
 }
 
